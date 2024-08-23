@@ -33,7 +33,17 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Text("This is Deep-Link test"),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("This is Deep-Link test"),
+            ElevatedButton(onPressed: (){
+
+            }, child: Text('Open web page'))
+          ],
+        ),
+      ),
     );
   }
 }
