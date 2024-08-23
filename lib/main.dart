@@ -1,48 +1,102 @@
 import 'package:flutter/material.dart';
+import 'package:app_links/app_links.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Deeplink Test',
+      title: 'Deep Link Example',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: HomeScreen(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
-
+class HomeScreen extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _HomeScreenState extends State<HomeScreen> {
+  final AppLinks _appLinks = AppLinks();
+  String _linkMessage = 'Waiting for deep link...';
+
+  @override
+  void initState() {
+    super.initState();
+
+    // 앱이 시작될 때 받은 URL 처리
+    _appLinks.getInitialLink().then((uri) {
+      _handleDeepLink(uri);
+    });
+
+    // 앱이 실행 중일 때 도착하는 URL 처리
+    _appLinks.uriLinkStream.listen((uri) {
+      _handleDeepLink(uri);
+    });
+  }
+
+  void _handleDeepLink(Uri? uri) {
+    if (uri != null) { // 경로에 따라 다른 화면으로 네비게이션
+      if (uri.pathSegments.isNotEmpty) {
+        final path = uri.pathSegments.first;
+        if (path == 'page1') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Page1Screen()),
+          );
+        } else if (path == 'page2') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Page2Screen()),
+          );
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Home Screen'),
+      ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text("This is Deep-Link test"),
-            ElevatedButton(onPressed: (){
+        child: Text(_linkMessage),
+      ),
+    );
+  }
+}
 
-            }, child: Text('Open web page'))
-          ],
-        ),
+class Page1Screen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Page 1'),
+      ),
+      body: Center(
+        child: Text('Welcome to Page 1!'),
+      ),
+    );
+  }
+}
+
+class Page2Screen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Page 2'),
+      ),
+      body: Center(
+        child: Text('Welcome to Page 2!'),
       ),
     );
   }
